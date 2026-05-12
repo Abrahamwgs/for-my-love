@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>For You — A Love Letter</title>
+  <meta name="description" content="A handmade love letter for a future doctor." />
+  <meta name="theme-color" content="#1a0511" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Dancing+Script:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Three.js via import map -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <!-- ─────────── PRELOADER ─────────── -->
+  <div class="preloader" id="preloader" aria-hidden="true">
+    <div class="preloader__ring"></div>
+    <div class="preloader__heart">♥</div>
+    <p class="preloader__text">Loading something made just for you…</p>
+  </div>
+
+  <!-- ─────────── CUSTOM CURSOR ─────────── -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor cursor--dot" id="cursor-dot"></div>
+
+  <!-- ─────────── AMBIENT PARTICLES (CSS) ─────────── -->
+  <div class="petals" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span><span></span>
+  </div>
+
+  <!-- ─────────── NAV ─────────── -->
+  <nav class="nav">
+    <a class="nav__brand" href="#home">
+      <span class="nav__brand-mark">♡</span>
+      <span class="nav__brand-text">for <em data-config="herName">my love</em></span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="#letter">letter</a></li>
+      <li><a href="#reasons">why</a></li>
+      <li><a href="#journey">us</a></li>
+      <li><a href="#song">our song</a></li>
+      <li><a href="#dna">forever</a></li>
+    </ul>
+    <a class="nav__song" href="#song" aria-label="Jump to our song" title="Our song">
+      <span class="nav__song-icon" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+      </span>
+      <span class="nav__song-label">play</span>
+    </a>
+  </nav>
+
+  <!-- ─────────── HERO ─────────── -->
+  <section class="hero" id="home">
+    <canvas id="heart-canvas" class="hero__canvas" aria-hidden="true"></canvas>
+
+    <div class="hero__content">
+      <p class="hero__eyebrow reveal" data-delay="0">
+        <span class="hero__eyebrow-line"></span>
+        a private letter — for
+        <span class="hero__eyebrow-line"></span>
+      </p>
+
+      <h1 class="hero__title">
+        <span class="word" data-delay="200" data-config="herName">My Love</span>
+      </h1>
+
+      <p class="hero__subtitle reveal" data-delay="800">
+        future <em data-config="futureTitle">Dr.</em>
+        <span data-config="herName">My Love</span> ·
+        student of medicine · keeper of my heart
+      </p>
+
+      <div class="hero__scroll reveal" data-delay="1400">
+        <span>scroll</span>
+        <span class="hero__scroll-line"></span>
+      </div>
+    </div>
+
+    <div class="hero__vitals reveal" data-delay="1200" aria-hidden="true">
+      <svg class="ecg" viewBox="0 0 600 80" preserveAspectRatio="none">
+        <path d="M0,40 L120,40 L140,40 L150,20 L160,60 L170,10 L180,70 L190,40 L320,40 L340,40 L350,25 L360,55 L370,40 L600,40"
+              fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="ecg__bpm"><b>72</b> bpm · steady, because of you</span>
+    </div>
+  </section>
+
+  <!-- ─────────── LETTER ─────────── -->
+  <section class="letter" id="letter">
+    <div class="letter__paper">
+      <div class="letter__header">
+        <span class="letter__rx">Rx</span>
+        <div>
+          <p class="letter__from">From the desk of a heart, completely yours</p>
+          <p class="letter__to">To: <em data-config="herName">My Love</em></p>
+        </div>
+        <span class="letter__date" id="letter-date"></span>
+      </div>
+
+      <div class="letter__body" id="letter-body">
+        <!-- filled by script.js from config -->
+      </div>
+
+      <div class="letter__sign">
+        <svg class="signature" viewBox="0 0 220 60" aria-hidden="true">
+          <path id="sig-path"
+            d="M5,45 C20,5 40,55 60,30 C80,5 100,55 120,30 C140,10 165,50 185,25 C195,15 210,30 215,40"
+            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <p class="letter__signoff" data-config="yourName">Yours, always</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── REASONS / DIAGNOSES ─────────── -->
+  <section class="reasons" id="reasons">
+    <header class="section-head">
+      <p class="section-head__kicker">case file · 001</p>
+      <h2 class="section-head__title">Why I love you — <em>a differential.</em></h2>
+      <p class="section-head__sub">
+        Six diagnoses, one patient (me). Findings below.
+      </p>
+    </header>
+
+    <div class="reasons__grid" id="reasons-grid">
+      <!-- filled by script.js from config -->
+    </div>
+  </section>
+
+  <!-- ─────────── JOURNEY / TIMELINE ─────────── -->
+  <section class="journey" id="journey">
+    <header class="section-head">
+      <p class="section-head__kicker">our chart</p>
+      <h2 class="section-head__title">A timeline, in heartbeats.</h2>
+    </header>
+
+    <ol class="timeline" id="timeline">
+      <!-- filled by script.js from config -->
+    </ol>
+  </section>
+
+  <!-- ─────────── OUR SONG ─────────── -->
+  <section class="song" id="song">
+    <div class="song__bg" aria-hidden="true"></div>
+
+    <header class="section-head">
+      <p class="section-head__kicker">track 01 · on repeat, forever</p>
+      <h2 class="section-head__title">Sometimes a song just <em>knows.</em></h2>
+    </header>
+
+    <div class="song__stage">
+      <!-- Spinning vinyl on the left -->
+      <div class="vinyl" aria-hidden="true">
+        <div class="vinyl__disc">
+          <div class="vinyl__ring vinyl__ring--1"></div>
+          <div class="vinyl__ring vinyl__ring--2"></div>
+          <div class="vinyl__ring vinyl__ring--3"></div>
+          <div class="vinyl__ring vinyl__ring--4"></div>
+          <div class="vinyl__label">
+            <span class="vinyl__label-top"   id="song-title">Dandelions</span>
+            <span class="vinyl__label-heart">♥</span>
+            <span class="vinyl__label-bot"   id="song-artist">Ruth B.</span>
+          </div>
+        </div>
+        <div class="vinyl__arm">
+          <div class="vinyl__arm-base"></div>
+          <div class="vinyl__arm-stick"></div>
+          <div class="vinyl__arm-head"></div>
+        </div>
+      </div>
+
+      <!-- Player + lyric on the right -->
+      <div class="song__panel">
+        <blockquote class="song__lyric" id="song-lyric">
+          "Up in the sky, you'll see one in a million — you're my dandelion."
+        </blockquote>
+
+        <div class="song__player">
+          <div id="spotify-embed" class="song__mount" aria-label="Spotify player"></div>
+        </div>
+
+        <div class="song__controls">
+          <button class="song__play" id="song-play-btn" type="button" aria-label="Play our song">
+            <span class="song__play-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 5v14l12-7z" fill="currentColor"/></svg>
+            </span>
+            <span class="song__play-label">play our song</span>
+            <span class="song__play-glow" aria-hidden="true"></span>
+          </button>
+          <a class="song__open" id="song-open" href="#" target="_blank" rel="noopener">
+            or open in Spotify <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+
+        <p class="song__note" id="song-note">Press play. Close your eyes. I'm right here.</p>
+        <p class="song__hint" id="song-hint">
+          tip: if you don't hear anything, sign in to Spotify in this browser
+          (free accounts work) — the embed only plays a short preview otherwise.
+        </p>
+
+        <div class="song__notes" aria-hidden="true">
+          <span>♪</span><span>♫</span><span>♪</span><span>♬</span><span>♫</span>
+          <span>♪</span><span>♫</span><span>♪</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── DNA ─────────── -->
+  <section class="dna" id="dna">
+    <canvas id="dna-canvas" class="dna__canvas" aria-hidden="true"></canvas>
+    <div class="dna__content">
+      <p class="section-head__kicker">double helix</p>
+      <h2 class="dna__title">Some things are <em>encoded.</em></h2>
+      <p class="dna__text">
+        Twenty-three pairs decide your eyes, your laugh, the slope of
+        your shoulders when you fall asleep over a textbook.
+        Loving you isn't a choice I keep making —
+        it reads like something already <span class="hl">written into me</span>.
+      </p>
+      <p class="dna__caption">A · T &nbsp;·&nbsp; G · C &nbsp;·&nbsp; you · me</p>
+    </div>
+  </section>
+
+  <!-- ─────────── FINALE ─────────── -->
+  <section class="finale" id="finale">
+    <div class="finale__glow" aria-hidden="true"></div>
+    <div class="finale__inner">
+      <p class="section-head__kicker">prognosis</p>
+      <h2 class="finale__title" data-config="finale">Forever is a small word for what I feel.</h2>
+
+      <button class="finale__button" id="celebrate-btn" type="button">
+        <span>press for a tiny celebration</span>
+        <span class="finale__button-glow"></span>
+      </button>
+
+      <p class="finale__signoff">
+        — <span data-config="yourName">Yours, always</span>
+      </p>
+    </div>
+
+    <canvas id="confetti-canvas" class="confetti" aria-hidden="true"></canvas>
+  </section>
+
+  <footer class="footer">
+    <p>handmade with ♥ · for the future <em data-config="futureTitle">Dr.</em>
+       <span data-config="herName">my love</span></p>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script type="module" src="heart.js"></script>
+  <script type="module" src="dna.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
