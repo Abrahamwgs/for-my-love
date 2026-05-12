@@ -1,29 +1,42 @@
 // ════════════════════════════════════════════════════════════════
 //  Three.js — a slowly rotating DNA double helix, lit from within.
-//  Two strands of "nucleotides" (spheres) joined by hydrogen-bond
-//  rungs (cylinders), built procedurally and gently floating.
+//  Uses MeshStandardMaterial (lighter shader than Physical) and
+//  modest geometry counts so even integrated GPUs / mobile chips
+//  compile and run it cleanly.
 // ════════════════════════════════════════════════════════════════
 import * as THREE from "three";
 
 const canvas = document.getElementById("dna-canvas");
 if (canvas) {
-  // Defer one frame so layout is finalized before reading clientWidth/Height.
-  // This is critical because the DNA section sits below the fold; without
-  // this wait, the canvas can briefly report 0×0 and the scene renders blank.
   requestAnimationFrame(() => requestAnimationFrame(() => initDNA(canvas)));
 }
 
 function initDNA(canvas) {
-  const renderer = new THREE.WebGLRenderer({
-    canvas, antialias: true, alpha: true,
-    powerPreference: "high-performance"
+  let contextValid = true;
+  canvas.addEventListener("webglcontextlost", (e) => {
+    e.preventDefault();
+    contextValid = false;
   });
+  canvas.addEventListener("webglcontextrestored", () => {
+    contextValid = true;
+  });
+
+  let renderer;
+  try {
+    renderer = new THREE.WebGLRenderer({
+      canvas, antialias: true, alpha: true,
+      powerPreference: "high-performance"
+    });
+  } catch (err) {
+    console.warn("[dna] WebGL unavailable:", err);
+    return;
+  }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.15;
 
-  const scene = new THREE.Scene();
+  const scene  = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
   camera.position.set(0, 0, 24);
 
@@ -38,19 +51,15 @@ function initDNA(canvas) {
   const height       = 12;
   const dy           = height / totalPoints;
 
-  const sphereGeo = new THREE.SphereGeometry(0.34, 28, 28);
-  const rungGeo   = new THREE.CylinderGeometry(0.06, 0.06, 1, 12);
+  const sphereGeo = new THREE.SphereGeometry(0.34, 16, 16);
+  const rungGeo   = new THREE.CylinderGeometry(0.06, 0.06, 1, 8);
 
-  const matA = new THREE.MeshPhysicalMaterial({
-    color: 0xe8a4c9,
-    metalness: 0.15, roughness: 0.30,
-    clearcoat: 0.7, clearcoatRoughness: 0.25,
+  const matA = new THREE.MeshStandardMaterial({
+    color: 0xe8a4c9, metalness: 0.15, roughness: 0.35,
     emissive: 0x7a1e3d, emissiveIntensity: 0.7
   });
-  const matB = new THREE.MeshPhysicalMaterial({
-    color: 0xf3d27a,
-    metalness: 0.20, roughness: 0.28,
-    clearcoat: 0.7, clearcoatRoughness: 0.25,
+  const matB = new THREE.MeshStandardMaterial({
+    color: 0xf3d27a, metalness: 0.20, roughness: 0.32,
     emissive: 0x7a5418, emissiveIntensity: 0.6
   });
   const matRung = new THREE.MeshBasicMaterial({
@@ -67,13 +76,8 @@ function initDNA(canvas) {
     const pa = new THREE.Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius);
     const pb = new THREE.Vector3(Math.cos(a + Math.PI) * radius, y, Math.sin(a + Math.PI) * radius);
 
-    const sa = new THREE.Mesh(sphereGeo, matA);
-    sa.position.copy(pa);
-    helixA.add(sa);
-
-    const sb = new THREE.Mesh(sphereGeo, matB);
-    sb.position.copy(pb);
-    helixB.add(sb);
+    const sa = new THREE.Mesh(sphereGeo, matA); sa.position.copy(pa); helixA.add(sa);
+    const sb = new THREE.Mesh(sphereGeo, matB); sb.position.copy(pb); helixB.add(sb);
 
     if (i % 2 === 0) {
       const rung = new THREE.Mesh(rungGeo, matRung);
@@ -88,7 +92,7 @@ function initDNA(canvas) {
   dna.add(helixA);
   dna.add(helixB);
 
-  // Backbone tubes for cohesion
+  // Backbone tubes
   const curveA = new THREE.CatmullRomCurve3(
     Array.from({ length: totalPoints }, (_, i) => {
       const a = (i / pointsPerTurn) * Math.PI * 2;
@@ -103,11 +107,11 @@ function initDNA(canvas) {
   );
   const tubeMatA = new THREE.MeshBasicMaterial({ color: 0xc4677d, transparent: true, opacity: 0.7 });
   const tubeMatB = new THREE.MeshBasicMaterial({ color: 0xe6a85c, transparent: true, opacity: 0.7 });
-  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveA, 240, 0.06, 10, false), tubeMatA));
-  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveB, 240, 0.06, 10, false), tubeMatB));
+  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveA, 140, 0.06, 6, false), tubeMatA));
+  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveB, 140, 0.06, 6, false), tubeMatB));
 
   // ── Particles (floating motes) ────────────────────────────────
-  const pCount = 280;
+  const pCount = 200;
   const pPos = new Float32Array(pCount * 3);
   for (let i = 0; i < pCount; i++) {
     pPos[i*3]   = (Math.random() - 0.5) * 22;
@@ -123,16 +127,16 @@ function initDNA(canvas) {
   const motes = new THREE.Points(pGeo, pMat);
   scene.add(motes);
 
-  // ── Lights — brighter so the helix glows clearly ──────────────
+  // ── Lights ────────────────────────────────────────────────────
   scene.add(new THREE.AmbientLight(0xffd8e4, 0.9));
-  const l1 = new THREE.PointLight(0xff7aa2, 120, 40, 2);
+  const l1 = new THREE.PointLight(0xff7aa2, 110, 40, 2);
   l1.position.set(6, 4, 6); scene.add(l1);
-  const l2 = new THREE.PointLight(0xf3d27a, 90, 40, 2);
+  const l2 = new THREE.PointLight(0xf3d27a, 85,  40, 2);
   l2.position.set(-6, -4, 4); scene.add(l2);
-  const l3 = new THREE.DirectionalLight(0xffffff, 0.45);
+  const l3 = new THREE.DirectionalLight(0xffffff, 0.4);
   l3.position.set(0, 0, 10); scene.add(l3);
 
-  // ── Resize — uses ResizeObserver so we catch layout changes ───
+  // ── Resize ────────────────────────────────────────────────────
   function resize() {
     const w = canvas.clientWidth  || canvas.parentElement.clientWidth  || 1;
     const h = canvas.clientHeight || canvas.parentElement.clientHeight || 1;
@@ -144,9 +148,7 @@ function initDNA(canvas) {
   }
   resize();
   window.addEventListener("resize", resize);
-  if ("ResizeObserver" in window) {
-    new ResizeObserver(resize).observe(canvas);
-  }
+  if ("ResizeObserver" in window) new ResizeObserver(resize).observe(canvas);
 
   // ── Mouse parallax ────────────────────────────────────────────
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
@@ -158,6 +160,9 @@ function initDNA(canvas) {
   // ── Animate ───────────────────────────────────────────────────
   const clock = new THREE.Clock();
   function tick() {
+    requestAnimationFrame(tick);
+    if (!contextValid) return;
+
     const t = clock.getElapsedTime();
     mouse.x += (mouse.tx - mouse.x) * 0.04;
     mouse.y += (mouse.ty - mouse.y) * 0.04;
@@ -168,8 +173,12 @@ function initDNA(canvas) {
 
     motes.rotation.y = -t * 0.05;
 
-    renderer.render(scene, camera);
-    requestAnimationFrame(tick);
+    try {
+      renderer.render(scene, camera);
+    } catch (err) {
+      contextValid = false;
+      console.warn("[dna] render error, halting:", err);
+    }
   }
   tick();
 }
