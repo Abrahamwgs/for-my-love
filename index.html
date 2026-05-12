@@ -244,27 +244,37 @@
         </blockquote>
 
         <div class="song__player">
-          <div id="spotify-embed" class="song__mount" aria-label="Spotify player"></div>
+          <audio id="song-audio" preload="metadata"></audio>
+
+          <div class="song__progress" id="song-progress" role="progressbar" aria-label="Song progress" tabindex="0">
+            <div class="song__progress-fill" id="song-progress-fill"></div>
+            <div class="song__progress-thumb" id="song-progress-thumb"></div>
+          </div>
+
+          <div class="song__times">
+            <span id="song-time-current">0:00</span>
+            <span class="song__times-sep">·</span>
+            <span id="song-time-total">--:--</span>
+          </div>
         </div>
 
         <div class="song__controls">
           <button class="song__play" id="song-play-btn" type="button" aria-label="Play our song">
             <span class="song__play-icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="22" height="22"><path d="M7 5v14l12-7z" fill="currentColor"/></svg>
+              <svg class="song__play-svg song__play-svg--play"  viewBox="0 0 24 24" width="22" height="22">
+                <path d="M7 5v14l12-7z" fill="currentColor"/>
+              </svg>
+              <svg class="song__play-svg song__play-svg--pause" viewBox="0 0 24 24" width="22" height="22">
+                <rect x="6"  y="5" width="4" height="14" fill="currentColor"/>
+                <rect x="14" y="5" width="4" height="14" fill="currentColor"/>
+              </svg>
             </span>
             <span class="song__play-label">play our song</span>
             <span class="song__play-glow" aria-hidden="true"></span>
           </button>
-          <a class="song__open" id="song-open" href="#" target="_blank" rel="noopener">
-            or open in Spotify <span aria-hidden="true">↗</span>
-          </a>
         </div>
 
         <p class="song__note" id="song-note">Press play. Close your eyes. I'm right here.</p>
-        <p class="song__hint" id="song-hint">
-          tip: if you don't hear anything, sign in to Spotify in this browser
-          (free accounts work) — the embed only plays a short preview otherwise.
-        </p>
 
         <div class="song__notes" aria-hidden="true">
           <span>♪</span><span>♫</span><span>♪</span><span>♬</span><span>♫</span>

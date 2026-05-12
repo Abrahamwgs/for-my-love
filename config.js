@@ -51,13 +51,16 @@ window.SITE_CONFIG = {
     { when: "Tomorrow", title: "Dr. You",           text: "And I'll be in the front row, every single time." }
   ],
 
-  // Our song — pulls a live Spotify player into the site
+  // Our song — plays a local MP3 file you ship with the site.
+  // Put your audio file next to index.html and put its filename in `file`.
+  // (Common names: "our-song.mp3", "dandelions.mp3" — any filename works.)
   song: {
-    title:     "Dandelions",
-    artist:    "Ruth B.",
-    spotifyId: "5tAbIB3WfBguodC8d9uqO5",
-    lyric:     "Up in the sky, you'll see one in a million — you're my dandelion.",
-    note:      "Press play. Close your eyes. I'm right here."
+    title:  "Dandelions",
+    artist: "Ruth B.",
+    file:   "our-song.mp3",   // ← put your MP3 in the project folder and name it this
+    loop:   true,              // keep playing on repeat
+    lyric:  "Up in the sky, you'll see one in a million — you're my dandelion.",
+    note:   "Press play. Close your eyes. I'm right here."
   },
 
   // Final whispered line on the closing screen

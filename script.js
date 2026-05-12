@@ -153,7 +153,7 @@ if (!window.location.hash) {
     });
   });
 
-  // ── 11. Our Song — Spotify iframe API + custom play button ────
+  // ── 11. Our Song — local HTML5 audio + custom player ──────────
   const song = cfg.song || {};
   const setText = (id, val) => {
     const el = document.getElementById(id);
@@ -164,101 +164,89 @@ if (!window.location.hash) {
   setText("song-lyric", song.lyric ? `\u201C${song.lyric}\u201D` : "");
   setText("song-note", song.note);
 
+  const audio    = document.getElementById("song-audio");
   const playBtn  = document.getElementById("song-play-btn");
-  const openLink = document.getElementById("song-open");
-  const mount    = document.getElementById("spotify-embed");
   const labelEl  = playBtn ? playBtn.querySelector(".song__play-label") : null;
+  const bar      = document.getElementById("song-progress");
+  const barFill  = document.getElementById("song-progress-fill");
+  const barThumb = document.getElementById("song-progress-thumb");
+  const tCurrent = document.getElementById("song-time-current");
+  const tTotal   = document.getElementById("song-time-total");
 
-  if (openLink && song.spotifyId) {
-    openLink.href = `https://open.spotify.com/track/${encodeURIComponent(song.spotifyId)}`;
-  }
-
-  if (mount && song.spotifyId) {
-    let controller = null;
-    let isPlaying  = false;
-    let apiLoaded  = false;
+  if (audio && song.file) {
+    audio.src  = song.file;
+    audio.loop = !!song.loop;
 
     const setLabel = (txt) => { if (labelEl) labelEl.textContent = txt; };
     const setPlayingUI = (on) => {
-      isPlaying = on;
       if (playBtn) playBtn.classList.toggle("is-playing", on);
+      if (bar)     bar.classList.toggle("is-playing", on);
       setLabel(on ? "pause our song" : "play our song");
     };
 
-    // Define the callback BEFORE loading the API script.
-    window.onSpotifyIframeApiReady = (IFrameAPI) => {
-      apiLoaded = true;
-      IFrameAPI.createController(
-        mount,
-        {
-          uri: `spotify:track:${song.spotifyId}`,
-          width: "100%",
-          height: 152,
-          theme: "0"
-        },
-        (ctl) => {
-          controller = ctl;
-          ctl.addListener("playback_update", (e) => {
-            if (!e || !e.data) return;
-            setPlayingUI(!e.data.isPaused);
-          });
-          ctl.addListener("ready", () => {
-            setLabel("play our song");
-          });
-        }
-      );
-    };
+    function fmt(s) {
+      if (!isFinite(s) || s < 0) return "--:--";
+      const m = Math.floor(s / 60);
+      const r = Math.floor(s % 60).toString().padStart(2, "0");
+      return `${m}:${r}`;
+    }
 
-    // Load the Spotify iframe API — but only after the page is interactive,
-    // so a slow Spotify CDN never delays the preloader.
-    function loadSpotifyAPI() {
-      const s = document.createElement("script");
-      s.src = "https://open.spotify.com/embed/iframe-api/v1";
-      s.async = true;
-      s.onerror = () => fallbackToIframe("script failed");
-      document.head.appendChild(s);
-      // If the API didn't load in time, fall back to a plain iframe.
-      setTimeout(() => { if (!apiLoaded) fallbackToIframe("timeout"); }, 4000);
+    function updateProgress() {
+      if (!audio.duration || !isFinite(audio.duration)) return;
+      const pct = (audio.currentTime / audio.duration) * 100;
+      if (barFill)  barFill.style.width = pct + "%";
+      if (barThumb) barThumb.style.left  = pct + "%";
+      if (tCurrent) tCurrent.textContent = fmt(audio.currentTime);
     }
-    if (document.readyState === "loading") {
-      document.addEventListener("DOMContentLoaded", () => setTimeout(loadSpotifyAPI, 800));
-    } else {
-      setTimeout(loadSpotifyAPI, 800);
-    }
+
+    audio.addEventListener("loadedmetadata", () => {
+      if (tTotal) tTotal.textContent = fmt(audio.duration);
+    });
+    audio.addEventListener("timeupdate", updateProgress);
+    audio.addEventListener("play",  () => setPlayingUI(true));
+    audio.addEventListener("pause", () => setPlayingUI(false));
+    audio.addEventListener("ended", () => setPlayingUI(false));
+    audio.addEventListener("error", (e) => {
+      console.warn("[song] audio failed to load:", audio.src, e);
+      setLabel("audio file missing");
+      if (playBtn) playBtn.disabled = true;
+    });
 
     if (playBtn) {
       playBtn.addEventListener("click", () => {
-        if (controller && controller.togglePlay) {
-          controller.togglePlay();
+        if (audio.paused) {
+          const p = audio.play();
+          if (p && p.catch) p.catch((err) => {
+            console.warn("[song] play blocked:", err);
+            setLabel("tap again to play");
+          });
         } else {
-          // Controller not ready — open Spotify directly so they always hear it.
-          if (openLink) window.open(openLink.href, "_blank", "noopener");
+          audio.pause();
         }
       });
     }
 
-    function fallbackToIframe(_reason) {
-      if (controller || mount.querySelector("iframe")) return;
-      const iframe = document.createElement("iframe");
-      iframe.title = `${song.title || "Our song"} — ${song.artist || ""}`;
-      iframe.src   = `https://open.spotify.com/embed/track/${encodeURIComponent(song.spotifyId)}?utm_source=generator&theme=0`;
-      iframe.width = "100%";
-      iframe.height = "152";
-      iframe.frameBorder = "0";
-      iframe.style.cssText = "border:0;border-radius:14px;display:block;width:100%;min-height:152px;";
-      iframe.setAttribute("allow", "autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture");
-      iframe.loading = "lazy";
-      mount.innerHTML = "";
-      mount.appendChild(iframe);
-      // Custom button becomes a passthrough that opens Spotify, since plain
-      // iframes can't be controlled cross-origin.
-      if (playBtn) {
-        setLabel("open in Spotify");
-        playBtn.addEventListener("click", () => {
-          if (openLink) window.open(openLink.href, "_blank", "noopener");
-        }, { once: true });
+    if (bar) {
+      function seekFromEvent(evt) {
+        const rect = bar.getBoundingClientRect();
+        const x = (evt.touches ? evt.touches[0].clientX : evt.clientX) - rect.left;
+        const ratio = Math.max(0, Math.min(1, x / rect.width));
+        if (audio.duration && isFinite(audio.duration)) {
+          audio.currentTime = ratio * audio.duration;
+          updateProgress();
+        }
       }
+      bar.addEventListener("click", seekFromEvent);
+      bar.addEventListener("keydown", (e) => {
+        if (!audio.duration) return;
+        if (e.key === "ArrowRight") audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+        if (e.key === "ArrowLeft")  audio.currentTime = Math.max(0,              audio.currentTime - 5);
+        if (e.key === " " || e.key === "Enter") { e.preventDefault(); playBtn && playBtn.click(); }
+      });
     }
+  } else if (audio) {
+    setLabel && setLabel("no song file");
+    if (playBtn) playBtn.disabled = true;
   }
 
   // ── 12. Confetti / heart burst on finale ──────────────────────

@@ -874,22 +874,69 @@ img, canvas, svg { display: block; max-width: 100%; }
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 30px 80px -30px rgba(0,0,0,.6), 0 0 40px rgba(232,164,201,.10);
 }
-.song__player iframe,
-.song__mount iframe {
-  display: block;
-  width: 100%;
-  border: 0;
-  border-radius: 14px;
-  min-height: 152px;
-  background: rgba(0,0,0,.3);
+.song__player audio { display: none; }
+
+/* ── Progress bar ─────────────────────────────────────────── */
+.song__progress {
+  position: relative;
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.08);
+  cursor: pointer;
+  overflow: visible;
+  margin: 6px 0 10px;
+  transition: height .2s var(--ease);
 }
-.song__mount {
-  min-height: 152px;
-  display: block;
-  border-radius: 14px;
-  background:
-    linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+.song__progress:hover,
+.song__progress:focus-visible { height: 9px; outline: none; }
+.song__progress-fill {
+  position: absolute; inset: 0 auto 0 0;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--rose), var(--gold));
+  box-shadow: 0 0 14px rgba(232,164,201,.6);
+  transition: width .12s linear;
 }
+.song__progress-thumb {
+  position: absolute;
+  top: 50%;
+  left: 0%;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--blush);
+  box-shadow: 0 0 12px rgba(232,164,201,.8), 0 0 0 4px rgba(232,164,201,.15);
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform .25s var(--ease), left .12s linear;
+  pointer-events: none;
+}
+.song__progress:hover .song__progress-thumb,
+.song__progress.is-playing .song__progress-thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.song__times {
+  display: flex; gap: 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  letter-spacing: .2em;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.song__times-sep { opacity: .5; }
+
+/* Play / pause icon swap */
+.song__play-icon { position: relative; }
+.song__play-svg {
+  display: block;
+  transition: opacity .25s var(--ease), transform .25s var(--ease);
+}
+.song__play-svg--pause {
+  position: absolute; inset: 0;
+  margin: auto;
+  opacity: 0; transform: scale(.6);
+}
+.song__play.is-playing .song__play-svg--play  { opacity: 0; transform: scale(.6); }
+.song__play.is-playing .song__play-svg--pause { opacity: 1; transform: scale(1); }
 
 .song__controls {
   display: flex; align-items: center; gap: 18px;
