@@ -7,6 +7,28 @@
   <meta name="description" content="A handmade love letter for a future doctor." />
   <meta name="theme-color" content="#1a0511" />
 
+  <!-- Critical inline CSS — guarantees a dark background on first paint,
+       even if styles.css is slow to load (common on first GitHub Pages
+       request, before the CDN caches the file). Prevents the white flash. -->
+  <style>
+    html, body {
+      margin: 0;
+      background: #0d0608;
+      color: #f8d7e1;
+      font-family: "Cormorant Garamond", "Times New Roman", serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    #preloader {
+      position: fixed; inset: 0; z-index: 9999;
+      display: grid; place-items: center;
+      background: #0d0608;
+      color: #e8a4c9;
+      font-family: "Cormorant Garamond", serif;
+      font-style: italic;
+    }
+  </style>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
