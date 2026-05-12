@@ -1,8 +1,6 @@
 // ════════════════════════════════════════════════════════════════
-//  Three.js — a slowly rotating DNA double helix, lit from within.
-//  Uses MeshStandardMaterial (lighter shader than Physical) and
-//  modest geometry counts so even integrated GPUs / mobile chips
-//  compile and run it cleanly.
+//  Three.js — slowly rotating DNA double helix.
+//  WebGL1 + MeshLambertMaterial + SVG fallback (see styles.css).
 // ════════════════════════════════════════════════════════════════
 import * as THREE from "three";
 
@@ -13,28 +11,26 @@ if (canvas) {
 
 function initDNA(canvas) {
   let contextValid = true;
+  let stopped      = false;
   canvas.addEventListener("webglcontextlost", (e) => {
     e.preventDefault();
     contextValid = false;
-  });
-  canvas.addEventListener("webglcontextrestored", () => {
-    contextValid = true;
+    stopped = true;
   });
 
   let renderer;
   try {
-    renderer = new THREE.WebGLRenderer({
+    const Renderer = THREE.WebGL1Renderer || THREE.WebGLRenderer;
+    renderer = new Renderer({
       canvas, antialias: true, alpha: true,
-      powerPreference: "high-performance"
+      powerPreference: "default"
     });
   } catch (err) {
-    console.warn("[dna] WebGL unavailable:", err);
+    console.warn("[dna] WebGL unavailable; using SVG fallback.", err);
     return;
   }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.15;
+  renderer.outputEncoding = THREE.sRGBEncoding;
 
   const scene  = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
@@ -45,22 +41,20 @@ function initDNA(canvas) {
   scene.add(dna);
 
   const turns        = 3;
-  const pointsPerTurn = 14;
+  const pointsPerTurn = 12;
   const totalPoints  = turns * pointsPerTurn;
   const radius       = 2.0;
   const height       = 12;
   const dy           = height / totalPoints;
 
-  const sphereGeo = new THREE.SphereGeometry(0.34, 16, 16);
-  const rungGeo   = new THREE.CylinderGeometry(0.06, 0.06, 1, 8);
+  const sphereGeo = new THREE.SphereGeometry(0.34, 12, 12);
+  const rungGeo   = new THREE.CylinderGeometry(0.06, 0.06, 1, 6);
 
-  const matA = new THREE.MeshStandardMaterial({
-    color: 0xe8a4c9, metalness: 0.15, roughness: 0.35,
-    emissive: 0x7a1e3d, emissiveIntensity: 0.7
+  const matA = new THREE.MeshLambertMaterial({
+    color: 0xe8a4c9, emissive: 0x7a1e3d
   });
-  const matB = new THREE.MeshStandardMaterial({
-    color: 0xf3d27a, metalness: 0.20, roughness: 0.32,
-    emissive: 0x7a5418, emissiveIntensity: 0.6
+  const matB = new THREE.MeshLambertMaterial({
+    color: 0xf3d27a, emissive: 0x7a5418
   });
   const matRung = new THREE.MeshBasicMaterial({
     color: 0xfde7ee, transparent: true, opacity: 0.65
@@ -71,8 +65,7 @@ function initDNA(canvas) {
 
   for (let i = 0; i < totalPoints; i++) {
     const a = (i / pointsPerTurn) * Math.PI * 2;
-    const y = -height / 2 + i * dy;
-
+    const y = -height/2 + i*dy;
     const pa = new THREE.Vector3(Math.cos(a) * radius, y, Math.sin(a) * radius);
     const pb = new THREE.Vector3(Math.cos(a + Math.PI) * radius, y, Math.sin(a + Math.PI) * radius);
 
@@ -107,11 +100,11 @@ function initDNA(canvas) {
   );
   const tubeMatA = new THREE.MeshBasicMaterial({ color: 0xc4677d, transparent: true, opacity: 0.7 });
   const tubeMatB = new THREE.MeshBasicMaterial({ color: 0xe6a85c, transparent: true, opacity: 0.7 });
-  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveA, 140, 0.06, 6, false), tubeMatA));
-  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveB, 140, 0.06, 6, false), tubeMatB));
+  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveA, 120, 0.06, 6, false), tubeMatA));
+  dna.add(new THREE.Mesh(new THREE.TubeGeometry(curveB, 120, 0.06, 6, false), tubeMatB));
 
-  // ── Particles (floating motes) ────────────────────────────────
-  const pCount = 200;
+  // Particles
+  const pCount = 160;
   const pPos = new Float32Array(pCount * 3);
   for (let i = 0; i < pCount; i++) {
     pPos[i*3]   = (Math.random() - 0.5) * 22;
@@ -127,16 +120,16 @@ function initDNA(canvas) {
   const motes = new THREE.Points(pGeo, pMat);
   scene.add(motes);
 
-  // ── Lights ────────────────────────────────────────────────────
+  // Lights
   scene.add(new THREE.AmbientLight(0xffd8e4, 0.9));
-  const l1 = new THREE.PointLight(0xff7aa2, 110, 40, 2);
+  const l1 = new THREE.PointLight(0xff7aa2, 1.6, 40);
   l1.position.set(6, 4, 6); scene.add(l1);
-  const l2 = new THREE.PointLight(0xf3d27a, 85,  40, 2);
+  const l2 = new THREE.PointLight(0xf3d27a, 1.3, 40);
   l2.position.set(-6, -4, 4); scene.add(l2);
-  const l3 = new THREE.DirectionalLight(0xffffff, 0.4);
+  const l3 = new THREE.DirectionalLight(0xffffff, 0.5);
   l3.position.set(0, 0, 10); scene.add(l3);
 
-  // ── Resize ────────────────────────────────────────────────────
+  // Resize
   function resize() {
     const w = canvas.clientWidth  || canvas.parentElement.clientWidth  || 1;
     const h = canvas.clientHeight || canvas.parentElement.clientHeight || 1;
@@ -150,16 +143,21 @@ function initDNA(canvas) {
   window.addEventListener("resize", resize);
   if ("ResizeObserver" in window) new ResizeObserver(resize).observe(canvas);
 
-  // ── Mouse parallax ────────────────────────────────────────────
+  // Mouse parallax
   const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
   window.addEventListener("mousemove", (e) => {
     mouse.tx = (e.clientX / window.innerWidth)  * 2 - 1;
     mouse.ty = (e.clientY / window.innerHeight) * 2 - 1;
   });
 
-  // ── Animate ───────────────────────────────────────────────────
+  // Render loop with health monitor
+  const gl    = renderer.getContext();
   const clock = new THREE.Clock();
+  let goodFrames = 0;
+  let badFrames  = 0;
+
   function tick() {
+    if (stopped) return;
     requestAnimationFrame(tick);
     if (!contextValid) return;
 
@@ -170,15 +168,31 @@ function initDNA(canvas) {
     dna.rotation.y = t * 0.25 + mouse.x * 0.4;
     dna.rotation.x = Math.sin(t * 0.15) * 0.08 + mouse.y * 0.18;
     dna.position.y = Math.sin(t * 0.4) * 0.25;
-
     motes.rotation.y = -t * 0.05;
 
     try {
       renderer.render(scene, camera);
     } catch (err) {
-      contextValid = false;
-      console.warn("[dna] render error, halting:", err);
+      bail("render exception", err);
+      return;
+    }
+
+    const e = gl.getError();
+    if (e !== gl.NO_ERROR) {
+      badFrames++;
+      if (badFrames > 3) { bail("repeated WebGL errors: 0x" + e.toString(16)); return; }
+    } else {
+      badFrames = 0;
+      goodFrames++;
+      if (goodFrames === 2) canvas.classList.add("is-rendered");
     }
   }
   tick();
+
+  function bail(reason, err) {
+    stopped = true;
+    canvas.classList.remove("is-rendered");
+    console.info("[dna] falling back to SVG (" + reason + ")", err || "");
+    try { renderer.dispose(); } catch (_) {}
+  }
 }
