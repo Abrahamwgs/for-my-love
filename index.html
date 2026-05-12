@@ -92,33 +92,6 @@
 
   <!-- ─────────── HERO ─────────── -->
   <section class="hero" id="home">
-
-    <!-- CSS / SVG fallback heart — always rendered.  The WebGL canvas
-         sits on top and fades in only when Three.js successfully renders.
-         If WebGL fails, this is what stays visible. -->
-    <div class="hero__fallback" aria-hidden="true">
-      <svg class="hero__svg-heart" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <radialGradient id="heart-grad" cx="40%" cy="35%" r="70%">
-            <stop offset="0%"  stop-color="#ffb3c9" />
-            <stop offset="35%" stop-color="#ff5a82" />
-            <stop offset="70%" stop-color="#dc143c" />
-            <stop offset="100%" stop-color="#4a0613" />
-          </radialGradient>
-          <radialGradient id="heart-glow" cx="50%" cy="50%" r="60%">
-            <stop offset="0%"   stop-color="#ff5a82" stop-opacity="0.55" />
-            <stop offset="60%"  stop-color="#dc143c" stop-opacity="0.10" />
-            <stop offset="100%" stop-color="#dc143c" stop-opacity="0" />
-          </radialGradient>
-        </defs>
-        <circle cx="100" cy="100" r="95" fill="url(#heart-glow)" class="hero__svg-aura" />
-        <path
-          class="hero__svg-path"
-          d="M100,170 C100,160 60,140 30,90 C0,40 50,5 100,40 C150,5 200,40 170,90 C140,140 100,160 100,170 Z"
-          fill="url(#heart-grad)" />
-      </svg>
-    </div>
-
     <canvas id="heart-canvas" class="hero__canvas" aria-hidden="true"></canvas>
 
     <div class="hero__content">

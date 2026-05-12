@@ -257,48 +257,6 @@ img, canvas, svg { display: block; max-width: 100%; }
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   z-index: 1;
-  opacity: 0;
-  transition: opacity 1.2s var(--ease-out);
-}
-.hero__canvas.is-rendered { opacity: 1; }
-
-/* SVG / CSS fallback heart — visible whenever the WebGL canvas isn't */
-.hero__fallback {
-  position: absolute; inset: 0;
-  z-index: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-}
-.hero__svg-heart {
-  width: clamp(220px, 36vw, 480px);
-  height: clamp(220px, 36vw, 480px);
-  animation: heartFloat 6s ease-in-out infinite;
-  filter: drop-shadow(0 0 60px rgba(232,164,201,.45));
-}
-.hero__svg-path {
-  transform-origin: 100px 100px;
-  animation: heartPulse 1.1s ease-in-out infinite;
-}
-.hero__svg-aura {
-  transform-origin: 100px 100px;
-  animation: heartGlow 1.1s ease-in-out infinite;
-}
-@keyframes heartPulse {
-  0%, 100% { transform: scale(1); }
-  10%      { transform: scale(1.10); }
-  20%      { transform: scale(.96); }
-  30%      { transform: scale(1.08); }
-  50%      { transform: scale(1); }
-}
-@keyframes heartGlow {
-  0%, 100% { opacity: .55; transform: scale(.9); }
-  20%      { opacity: 1;   transform: scale(1.15); }
-  50%      { opacity: .65; transform: scale(1); }
-}
-@keyframes heartFloat {
-  0%, 100% { transform: translateY(0)   rotate(-1deg); }
-  50%      { transform: translateY(-8px) rotate(1.2deg); }
 }
 .hero__content {
   position: relative; z-index: 2;
