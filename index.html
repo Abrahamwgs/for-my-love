@@ -80,7 +80,7 @@
       <li><a href="#reasons">why</a></li>
       <li><a href="#journey">us</a></li>
       <li><a href="#song">our song</a></li>
-      <li><a href="#dna">forever</a></li>
+      <li><a href="#finale">forever</a></li>
     </ul>
     <a class="nav__song" href="#song" aria-label="Jump to our song" title="Our song">
       <span class="nav__song-icon" aria-hidden="true">
@@ -257,105 +257,6 @@
     </div>
   </section>
 
-  <!-- ─────────── DNA ─────────── -->
-  <section class="dna" id="dna">
-
-    <!-- CSS / SVG fallback DNA helix — always rendered.  Three.js canvas
-         fades in over this if WebGL works.
-         Two strands offset to create asymmetric grooves, alternating
-         A-T (rose+gold) and G-C (blush+cream) base-pair colours. -->
-    <div class="dna__fallback" aria-hidden="true">
-      <svg class="dna__svg" viewBox="-40 -200 80 400" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <defs>
-          <linearGradient id="dna-a" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stop-color="#e8a4c9" />
-            <stop offset="50%"  stop-color="#c4677d" />
-            <stop offset="100%" stop-color="#e8a4c9" />
-          </linearGradient>
-          <linearGradient id="dna-b" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%"   stop-color="#f3d27a" />
-            <stop offset="50%"  stop-color="#e6a85c" />
-            <stop offset="100%" stop-color="#f3d27a" />
-          </linearGradient>
-        </defs>
-
-        <g class="dna__svg-spin">
-          <!-- Strand A — sin(2π·y/80) amplitude ~22, four full pitches -->
-          <path
-            d="M 0,-200 C 14.5,-190 22,-180 22,-170
-               C 22,-160 14.5,-150 0,-140
-               C -14.5,-130 -22,-120 -22,-110
-               C -22,-100 -14.5,-90 0,-80
-               C 14.5,-70 22,-60 22,-50
-               C 22,-40 14.5,-30 0,-20
-               C -14.5,-10 -22,0 -22,10
-               C -22,20 -14.5,30 0,40
-               C 14.5,50 22,60 22,70
-               C 22,80 14.5,90 0,100
-               C -14.5,110 -22,120 -22,130
-               C -22,140 -14.5,150 0,160
-               C 14.5,170 22,180 22,190
-               C 22,195 18,198 14,200"
-            stroke="url(#dna-a)" stroke-width="4" fill="none" stroke-linecap="round" />
-
-          <!-- Strand B — same shape, offset down ~30 (≈135°) -->
-          <path
-            d="M -15.6,-200 C -21,-195 -22,-185 -22,-180
-               C -22,-170 -14.5,-160 0,-150
-               C 14.5,-140 22,-130 22,-120
-               C 22,-110 14.5,-100 0,-90
-               C -14.5,-80 -22,-70 -22,-60
-               C -22,-50 -14.5,-40 0,-30
-               C 14.5,-20 22,-10 22,0
-               C 22,10 14.5,20 0,30
-               C -14.5,40 -22,50 -22,60
-               C -22,70 -14.5,80 0,90
-               C 14.5,100 22,110 22,120
-               C 22,130 14.5,140 0,150
-               C -14.5,160 -22,170 -22,180
-               C -22,190 -18,198 -14,200"
-            stroke="url(#dna-b)" stroke-width="4" fill="none" stroke-linecap="round" />
-
-          <!-- Base pairs — alternating A-T / G-C colour pairs -->
-          <g class="dna__svg-rungs" stroke-width="2.4" stroke-linecap="round" opacity="0.9">
-            <line x1="22"  y1="-180" x2="-22" y2="-180" stroke="#ff7aa2" />
-            <line x1="18"  y1="-160" x2="-18" y2="-160" stroke="#f3d27a" />
-            <line x1="4"   y1="-140" x2="-4"  y2="-140" stroke="#fde7ee" />
-            <line x1="-18" y1="-120" x2="18"  y2="-120" stroke="#e6a85c" />
-            <line x1="-22" y1="-100" x2="22"  y2="-100" stroke="#ff7aa2" />
-            <line x1="-18" y1="-80"  x2="18"  y2="-80"  stroke="#f3d27a" />
-            <line x1="-4"  y1="-60"  x2="4"   y2="-60"  stroke="#fde7ee" />
-            <line x1="18"  y1="-40"  x2="-18" y2="-40"  stroke="#e6a85c" />
-            <line x1="22"  y1="-20"  x2="-22" y2="-20"  stroke="#ff7aa2" />
-            <line x1="18"  y1="0"    x2="-18" y2="0"    stroke="#f3d27a" />
-            <line x1="4"   y1="20"   x2="-4"  y2="20"   stroke="#fde7ee" />
-            <line x1="-18" y1="40"   x2="18"  y2="40"   stroke="#e6a85c" />
-            <line x1="-22" y1="60"   x2="22"  y2="60"   stroke="#ff7aa2" />
-            <line x1="-18" y1="80"   x2="18"  y2="80"   stroke="#f3d27a" />
-            <line x1="-4"  y1="100"  x2="4"   y2="100"  stroke="#fde7ee" />
-            <line x1="18"  y1="120"  x2="-18" y2="120"  stroke="#e6a85c" />
-            <line x1="22"  y1="140"  x2="-22" y2="140"  stroke="#ff7aa2" />
-            <line x1="18"  y1="160"  x2="-18" y2="160"  stroke="#f3d27a" />
-            <line x1="4"   y1="180"  x2="-4"  y2="180"  stroke="#fde7ee" />
-          </g>
-        </g>
-      </svg>
-    </div>
-
-    <canvas id="dna-canvas" class="dna__canvas" aria-hidden="true"></canvas>
-    <div class="dna__content">
-      <p class="section-head__kicker">double helix</p>
-      <h2 class="dna__title">Some things are <em>encoded.</em></h2>
-      <p class="dna__text">
-        Twenty-three pairs decide your eyes, your laugh, the slope of
-        your shoulders when you fall asleep over a textbook.
-        Loving you isn't a choice I keep making —
-        it reads like something already <span class="hl">written into me</span>.
-      </p>
-      <p class="dna__caption">A · T &nbsp;·&nbsp; G · C &nbsp;·&nbsp; you · me</p>
-    </div>
-  </section>
-
   <!-- ─────────── FINALE ─────────── -->
   <section class="finale" id="finale">
     <div class="finale__glow" aria-hidden="true"></div>
@@ -384,7 +285,6 @@
   <!-- Scripts -->
   <script src="config.js"></script>
   <script type="module" src="heart.js"></script>
-  <script type="module" src="dna.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
