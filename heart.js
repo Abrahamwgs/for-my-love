@@ -76,7 +76,6 @@ function initHeart(canvas) {
 
   const heart = new THREE.Mesh(heartGeometry, heartMaterial);
   heart.scale.set(0.85, 0.85, 0.85);
-  heart.rotation.x = Math.PI;
   scene.add(heart);
 
   // Inner glow (additive, no lighting needed).
@@ -86,7 +85,6 @@ function initHeart(canvas) {
   });
   const glow = new THREE.Mesh(heartGeometry, glowMaterial);
   glow.scale.set(0.95, 0.95, 0.95);
-  glow.rotation.x = Math.PI;
   scene.add(glow);
 
   // Particle aura
@@ -175,8 +173,8 @@ function initHeart(canvas) {
     glow.scale.set(0.97 * beat, 0.97 * beat, 0.97 * beat);
     glowMaterial.opacity = 0.10 + (beat - 1) * 1.6;
     heart.rotation.y = mouse.x * 0.45 + Math.sin(t * 0.4) * 0.06;
-    heart.rotation.z = mouse.y * 0.18;
-    heart.rotation.x = Math.PI + mouse.y * 0.18 + Math.sin(t * 0.3) * 0.04;
+    heart.rotation.z = mouse.y * 0.10;
+    heart.rotation.x = mouse.y * 0.18 + Math.sin(t * 0.3) * 0.04;
     glow.rotation.copy(heart.rotation);
 
     particles.rotation.y += 0.0009;
